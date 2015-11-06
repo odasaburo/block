@@ -22,14 +22,19 @@ public class BlockControl : MonoBehaviour {
 
     public bool gameplay_enable = false;
     public bool level_complete = false;
+
+    public AudioSource audio1;
+    public AudioClip matching;
     // Use this for initialization
     void Start () {
+        audio1 = GetComponent<AudioSource>();
         //init();
     }
 	
 	// Update is called once per frame
 	void Update () {
-        if(destroy_count == 72)
+        
+        if (destroy_count == 72)
         {
             level_complete = true;
             destroy_count = 0;
@@ -39,19 +44,27 @@ public class BlockControl : MonoBehaviour {
             mousepos = Input.mousePosition;
             width_index = (mousepos.x - startpos.x + width / 2) / width;
             height_index = (mousepos.y - startpos.y + height / 2) / height;
-            // Debug.Log((int)width_index + "," + (int)height_index);
 
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    block_same[i, j] = 0;
+                }
+            }
+            detectAround((int)width_index, (int)height_index);
             if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log((int)width_index + 1 + "," + ((int)height_index + 1));
+                //Debug.Log((int)width_index + 1 + "," + ((int)height_index + 1));
                 /////////////////destroy block//////////////////////
-                detectAround((int)width_index, (int)height_index);
+                //detectAround((int)width_index, (int)height_index);
                 for (int i = 0; i < 8; i++)
                 {
                     for (int j = 0; j < 9; j++)
                     {
                         if (block_same[i, j] == 1)
                         {
+                            audio1.PlayOneShot(matching);
                             Destroy(stageblock[i, j]);
                             block_color[i, j] = 10;
                             destroy_count++;
@@ -82,7 +95,7 @@ public class BlockControl : MonoBehaviour {
                             }
                             else
                             {
-                                Debug.Log(i + "," + j);
+                                //Debug.Log(i + "," + j);
                             }
                         }
                     }
@@ -108,12 +121,14 @@ public class BlockControl : MonoBehaviour {
                                 block_color[i, j] = block_color[i, k];
                                 block_color[i, k] = 10;
                                 stageblock[i, k] = null;
+                                stageblock[i, j].GetComponent<setPosition>().addposition(0, -height * (k - j));
                                 break;
                             }
                         }
                     }
                 }
             }
+
             for (int i = 7; i >= 0; i--)
             {
                 if (stageblock[i, 0] == null && stageblock[i, 1] == null && stageblock[i, 2] == null && stageblock[i, 3] == null && stageblock[i, 4] == null && stageblock[i, 5] == null && stageblock[i, 6] == null && stageblock[i, 7] == null && stageblock[i, 8] == null)
@@ -188,6 +203,7 @@ public class BlockControl : MonoBehaviour {
             {
                 if (stageblock[i, j] != null)
                 {
+
                     Destroy(stageblock[i, j]);
                     block_color[i, j] = 10;
                 }
@@ -206,7 +222,7 @@ public class BlockControl : MonoBehaviour {
                     if (block_color[x_index - 1, y_index] == block_color[x_index, y_index])
                     {
                         block_same[x_index - 1, y_index] = 1;
-                        Debug.Log(x_index + "," + (y_index + 1));
+                        //Debug.Log(x_index + "," + (y_index + 1));
                         detectAround(x_index - 1, y_index);
                     }
                 }
@@ -217,7 +233,7 @@ public class BlockControl : MonoBehaviour {
                     if (block_color[x_index + 1, y_index] == block_color[x_index, y_index])
                     {
                         block_same[x_index + 1, y_index] = 1;
-                        Debug.Log(x_index + 2 + "," + (y_index + 1));
+                        //Debug.Log(x_index + 2 + "," + (y_index + 1));
                         detectAround(x_index + 1, y_index);
                     }
                 }
@@ -227,7 +243,7 @@ public class BlockControl : MonoBehaviour {
                     if (block_color[x_index, y_index - 1] == block_color[x_index, y_index])
                     {
                         block_same[x_index, y_index - 1] = 1;
-                        Debug.Log(x_index + 1 + "," + y_index);
+                        //Debug.Log(x_index + 1 + "," + y_index);
                         detectAround(x_index, y_index - 1);
                     }
                 }
@@ -237,7 +253,7 @@ public class BlockControl : MonoBehaviour {
                     if (block_color[x_index, y_index + 1] == block_color[x_index, y_index])
                     {
                         block_same[x_index, y_index + 1] = 1;
-                        Debug.Log(x_index + 1 + "," + (y_index + 1));
+                        //Debug.Log(x_index + 1 + "," + (y_index + 1));
                         detectAround(x_index, y_index + 1);
                     }
                 }

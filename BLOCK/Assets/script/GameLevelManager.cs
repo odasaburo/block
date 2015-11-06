@@ -5,6 +5,7 @@ public class GameLevelManager : MonoBehaviour {
     public GameObject blockcontrol;
     public GameObject playmenu;
     public GameObject complete;
+    public GameObject audioONOFF;
 	// Use this for initialization
 	void Start () {
         complete.SetActive(false);
@@ -63,6 +64,11 @@ public class GameLevelManager : MonoBehaviour {
     }
 
     public void SoundSet(string onoff)
+    {
+
+    }
+
+    public void audioSwitch()
     {
 
     }
