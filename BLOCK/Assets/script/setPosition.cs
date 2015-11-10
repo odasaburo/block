@@ -13,6 +13,7 @@ public class setPosition : MonoBehaviour {
         oldpos = child.GetComponent<RectTransform>().position;
         posx = 0;
         posy = 0;
+        child.GetComponent<Image>().sprite = backimage1;
     }
 	
 	// Update is called once per frame

@@ -19,10 +19,12 @@ public class BlockControl : MonoBehaviour {
     float width_index;
     float height_index;
     public int destroy_count = 0;
+    public int destroy_once = 0;
+    
 
     public bool gameplay_enable = false;
     public bool level_complete = false;
-
+    
     public AudioSource audio1;
     public AudioClip matching;
     // Use this for initialization
@@ -52,9 +54,27 @@ public class BlockControl : MonoBehaviour {
                     block_same[i, j] = 0;
                 }
             }
+
             detectAround((int)width_index, (int)height_index);
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    if (stageblock[i, j] != null)
+                    {
+                        if (block_same[i, j] == 1)
+                        {
+                            stageblock[i, j].GetComponentInChildren<Image>().sprite = stageblock[i, j].GetComponent<setPosition>().backimage2;
+                        }else if(block_same[i, j] == 0)
+                        {
+                            stageblock[i, j].GetComponentInChildren<Image>().sprite = stageblock[i, j].GetComponent<setPosition>().backimage1;
+                        }
+                    }
+                }
+            }
             if (Input.GetMouseButtonDown(0))
             {
+                destroy_once = 0;
                 //Debug.Log((int)width_index + 1 + "," + ((int)height_index + 1));
                 /////////////////destroy block//////////////////////
                 //detectAround((int)width_index, (int)height_index);
@@ -68,8 +88,18 @@ public class BlockControl : MonoBehaviour {
                             Destroy(stageblock[i, j]);
                             block_color[i, j] = 10;
                             destroy_count++;
+                            destroy_once++;
                         }
                     }
+                }
+                if(destroy_once == 1)
+                {
+                    this.gameObject.GetComponent<GameLevelManager>().lives--;
+                    this.gameObject.GetComponent<GameLevelManager>().score += (destroy_once * destroy_once);
+                }
+                else
+                {
+                    this.gameObject.GetComponent<GameLevelManager>().score += (destroy_once * destroy_once);
                 }
                 //////////////block_same init///////////////////////////
                 for (int i = 0; i < 8; i++)
@@ -193,6 +223,7 @@ public class BlockControl : MonoBehaviour {
                 stageblock[i, j] = newblockcanvas;
             }
         }
+        destroy_count = 0;
     }
 
     public void destroyAll()
