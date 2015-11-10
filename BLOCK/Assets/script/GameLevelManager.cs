@@ -8,6 +8,7 @@ public class GameLevelManager : MonoBehaviour {
     public GameObject complete;
     public GameObject[] gamebackground;
     public GameObject life;
+    public GameObject FBobject;
     public Image audiobutton;
     public Sprite audioON;
     public Sprite audioOFF;
@@ -24,6 +25,7 @@ public class GameLevelManager : MonoBehaviour {
         life.SetActive(false);
         AudioListener.volume = 1;
         audiobutton.sprite = audioON;
+        //FBobject.GetComponent<FBHolder>().FBlogin();
     }
 	
 	// Update is called once per frame

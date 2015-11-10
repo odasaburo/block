@@ -151,7 +151,9 @@
     <Compile Include="Assets\Facebook\Scripts\Utils\MiniJson.cs" />
     <Compile Include="Assets\Facebook\Scripts\Utils\Utilities.cs" />
     <Compile Include="Assets\script\BlockControl.cs" />
+    <Compile Include="Assets\script\FBHolder.cs" />
     <Compile Include="Assets\script\GameLevelManager.cs" />
+    <Compile Include="Assets\script\Util.cs" />
     <Compile Include="Assets\script\setPosition.cs" />
   </ItemGroup>
   <ItemGroup>
