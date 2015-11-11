@@ -11,6 +11,13 @@ public class FBHolder : MonoBehaviour {
     public GameObject UIFBAvatar;
     public GameObject UIFBUserName;
     public GameObject UserPhoto;
+    public Text scoresDebug;
+    private List<object> scoreList = null;
+    public GameObject ScoreEntryPanel;
+    public GameObject ScoreScrolList;
+    public GameObject gameScore;
+    public GameObject sharetext;
+
     private Dictionary<string, string> profile = null;
 
     void Awake()
@@ -47,7 +54,7 @@ public class FBHolder : MonoBehaviour {
 
     public void FBlogin()
     {
-        FB.LogInWithReadPermissions(new List<string>() { "public_profile", "email","user_friends"},AuthCallback);
+        FB.LogInWithReadPermissions(new List<string>() { "public_profile", "email","user_friends", "publish_actions"},AuthCallback);
     }
 
     void AuthCallback(ILoginResult result)
@@ -72,6 +79,8 @@ public class FBHolder : MonoBehaviour {
             FB.API("/me/picture", HttpMethod.GET, DealWithProfilePicture);
 
             FB.API("/me?fields=id,first_name", HttpMethod.GET, DealWithUserName);
+
+            QueryScores();
         }
         else
         {
@@ -79,7 +88,7 @@ public class FBHolder : MonoBehaviour {
         }
     }
 
-    void DealWithProfilePicture(IGraphResult result)
+    void DealWithProfilePicture(IGraphResult result) 
     {
         if (result.Error != null)
         {
@@ -122,7 +131,7 @@ public class FBHolder : MonoBehaviour {
                             new Uri("https://developers.facebook.com/"),
                             "Test Title",
                             "Test caption",
-                            "Test Description",
+                            sharetext.GetComponent<Text>().text,
                             new Uri("http://i.imgur.com/zkYlB.jpg"),
                             string.Empty,
                             this.HandleResult);
@@ -158,4 +167,65 @@ public class FBHolder : MonoBehaviour {
 
         }
     }
+
+    // All scores API related thinks
+    public void QueryScores()
+    {
+        FB.API("/app/scores?fields=score,user.limit(30)", HttpMethod.GET, ScoresCallback);
+    }
+
+    private void ScoresCallback(IGraphResult result)
+    {
+        Debug.Log("Scores callback: " + result.RawResult);
+        
+
+        scoreList = Util.DeserializeScores(result.RawResult);
+
+        foreach(Transform child in ScoreScrolList.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+
+        foreach (object score in scoreList)
+        {
+            var entry = (Dictionary<string, object>) score;
+            var user = (Dictionary<string, object>) entry["user"];
+            //scoresDebug.text = scoresDebug.text + "UN: " + user["name"] + " - " + entry["score"] + ", ";
+
+            GameObject ScorePanel;
+            ScorePanel = Instantiate(ScoreEntryPanel) as GameObject;
+            ScorePanel.transform.parent = ScoreScrolList.transform;
+            Transform ThisScoreName = ScorePanel.transform.Find("FriendName");
+            Transform ThisScoreScore = ScorePanel.transform.Find("FriendScore");
+            Text ScoreName = ThisScoreName.GetComponent<Text>();
+            Text ScoreScore = ThisScoreScore.GetComponent<Text>();
+
+            ScoreName.text = user["name"].ToString();
+            ScoreScore.text = entry["score"].ToString();
+
+            Transform TheUserAvatar = ScorePanel.transform.Find("FriendAvatar");
+            Image UserAvatar = TheUserAvatar.GetComponent<Image>();
+
+            FB.API(user["id"].ToString() + "/picture", HttpMethod.GET, delegate(IGraphResult pictureresult) {
+                if(pictureresult.Error != null)
+                {
+                    Debug.Log(pictureresult.Error);
+                }
+                else
+                {
+                    UserAvatar.sprite = Sprite.Create(pictureresult.Texture, new Rect(0, 0, pictureresult.Texture.width, pictureresult.Texture.height), new Vector2(0.5f, 0.5f));
+                }
+            });
+        }
+    }
+    public void SetScore()
+    {
+        var scoredata = new Dictionary<string, string>();
+        scoredata["score"] = gameScore.GetComponent<Text>().text.ToString();
+        FB.API("/me/scores", HttpMethod.POST, delegate (IGraphResult result)
+        {
+            Debug.Log("Score submit result: " + result.RawResult);
+        }, scoredata);
+    }
+
 }

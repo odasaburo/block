@@ -9,6 +9,8 @@ public class GameLevelManager : MonoBehaviour {
     public GameObject[] gamebackground;
     public GameObject life;
     public GameObject FBobject;
+
+    public Text gameaction_text;
     public Image audiobutton;
     public Sprite audioON;
     public Sprite audioOFF;
@@ -122,5 +124,10 @@ public class GameLevelManager : MonoBehaviour {
         }
         int index = level % 3;
         gamebackground[index].SetActive(true);
+    }
+
+    public void setactionstring(string text)
+    {
+        gameaction_text.text = text;
     }
 }
